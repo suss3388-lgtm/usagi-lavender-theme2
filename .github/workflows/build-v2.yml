@@ -8,7 +8,7 @@ on:
       - .github/workflows/build-v2.yml
       - scripts/prepare_v2.py
       - assets/**
-      - 200611.png
+      - 200614.png
       - 1794869806252.png
   workflow_dispatch:
 
@@ -30,12 +30,12 @@ jobs:
       - id: check
         shell: bash
         run: |
-          if [[ -f usagi-lavender-theme2-project.zip ]] && [[ -f 200611.png || -f assets/200611.png ]] && [[ -f 1794869806252.png || -f assets/1794869806252.png ]]; then
+          if [[ -f usagi-lavender-theme2-project.zip ]] && [[ -f 200614.png || -f assets/200614.png ]] && [[ -f 1794869806252.png || -f assets/1794869806252.png ]]; then
             echo "present=true" >> "$GITHUB_OUTPUT"
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
             echo "### Waiting for revision 2 artwork" >> "$GITHUB_STEP_SUMMARY"
-            echo "Upload the original background reference as 200611.png and the selected tab PNG as 1794869806252.png. The next push will build revision 2." >> "$GITHUB_STEP_SUMMARY"
+            echo "Upload the replacement background as 200614.png and the selected tab PNG as 1794869806252.png. The next push will build revision 2." >> "$GITHUB_STEP_SUMMARY"
           fi
 
   build:
