@@ -2,7 +2,11 @@
 
 이전 제작 자료의 우사기 그림과 카카오 공식 Android 26.9.0 샘플로 구성한 테마 프로젝트입니다.
 
-## APK 다운로드
+## 2차 빌드 · 버전 1.1.0
+
+Actions에서 **Build Usagi Lavender revision 2**의 APK 빌드 작업까지 성공한 실행을 선택하고, `usagi-lavender-v2-apk-번호`를 다운로드합니다. 이 빌드는 새 배경 PNG를 그대로 사용하고, 짧은 말풍선에서 캐릭터가 압축되지 않도록 고정 영역과 텍스트 여백을 조정하며, 선택한 하단 메뉴의 그림만 연보라 우사기로 바꿉니다. `usagi-lavender-v2-previews-번호`에는 배경·메뉴·말풍선 폭별 미리보기가 포함됩니다. 카카오톡 실제 화면의 크롭·여백은 기기에서 확인해야 합니다.
+
+## 1차 APK 다운로드
 
 1. [Actions](https://github.com/suss3388-lgtm/usagi-lavender-theme2/actions)에서 **Build Usagi APK from project ZIP**을 선택합니다.
 2. APK 빌드 작업까지 초록색으로 완료된 최신 실행을 엽니다.
