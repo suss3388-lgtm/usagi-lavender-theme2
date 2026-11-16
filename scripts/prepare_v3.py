@@ -129,7 +129,7 @@ for side,fill,label in [("you","#FFFDF5","incoming"),("me","#FFECC1","outgoing")
     (XML/f"theme_chatroom_bubble_{side}_01_image.xml").write_text(xml)
     # Text widths model a punctuation mark, one Korean glyph, and longer
     # messages at the same font size. Compare the actual complete sticker crop.
-    sheet=Image.new("RGBA",(820,1150),"#F2E8FB")
+    sheet=Image.new("RGBA",(820,1400),"#F2E8FB")
     y=12
     cases=[]
     for text_width,text_height in [(9,54),(45,54),(90,54),(330,54),(330,114)]:
@@ -162,7 +162,7 @@ checks=checks.replace("expected four bubbles and one tab background",
                       "expected two continuation bubbles and one tab background")
 validator.write_text(checks)
 import json
-(PREVIEW/"bubble-geometry.json").write_text(json.dumps(report,indent=2)+"\\n")
+(PREVIEW/"bubble-geometry.json").write_text(json.dumps(report,indent=2))
 
 # Source launcher and nonlocalized theme labels keep the existing identity.
 for p in (PROJECT/"app/src/main/theme").glob("values*/strings.xml"):
