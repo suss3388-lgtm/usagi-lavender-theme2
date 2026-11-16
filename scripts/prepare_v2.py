@@ -40,7 +40,7 @@ def cutout(box):
             continue
         visited.add((x,y))
         r,g,b,a=pixels[x,y]
-        if min(r,g,b) < 175 or b < r-3 or b < g+2:
+        if min(r,g,b) < 215 or b < r-3 or b < g+2:
             continue
         pixels[x,y]=(r,g,b,0)
         todo.extend([(x-1,y),(x+1,y),(x,y-1),(x,y+1)])
@@ -104,7 +104,7 @@ for side,fill,label in [("you","#FFFDF5","incoming"),("me","#FFECC1","outgoing")
     sx=SX if side=="you" else (18,53)
     px=(100,127)  # 200px horizontal padding > 192px of non-stretch columns.
     assert px[0]+(W-1-px[1]) >= FIXED_WIDTH
-    ninepatch(img,f"theme_chatroom_bubble_{side}_01_image",sx,SY,px,(142,211))
+    ninepatch(img,f"theme_chatroom_bubble_{side}_01_image",sx,SY,px,(156,179))
     # Character pixels are identical across narrow and long simulated bubbles.
     def render(width):
         a,b=sx
