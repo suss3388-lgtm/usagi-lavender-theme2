@@ -10,6 +10,7 @@ on:
       - assets/**
       - 200614.png
       - 1794869806252.png
+      - file_*.png
   workflow_dispatch:
 
 permissions:
@@ -30,7 +31,7 @@ jobs:
       - id: check
         shell: bash
         run: |
-          if [[ -f usagi-lavender-theme2-project.zip ]] && [[ -f 200614.png || -f assets/200614.png ]] && [[ -f 1794869806252.png || -f assets/1794869806252.png ]]; then
+          if [[ -f usagi-lavender-theme2-project.zip ]] && [[ -f 200614.png || -f assets/200614.png || -f file_00000000d50082099f20787de0b9824d.png ]] && [[ -f 1794869806252.png || -f assets/1794869806252.png || -f file_0000000024748206a5d943989cc05052.png ]]; then
             echo "present=true" >> "$GITHUB_OUTPUT"
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
