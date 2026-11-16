@@ -142,7 +142,13 @@ for side,fill,label in [("you","#FFFDF5","incoming"),("me","#FFECC1","outgoing")
             (2,body_top+2,width-3,height-3),radius=32,fill=fill)
         x=inset if side=="you" else width-inset-aw
         result.alpha_composite(art,(x,0))
-        assert result.crop((x,0,x+aw,body_top)).tobytes() == art.crop((0,0,aw,body_top)).tobytes()
+        # Hidden RGB values in fully transparent pixels are not visible art.
+        # Compare the rendered pixels over the same opaque matte instead.
+        observed=Image.new("RGBA",(aw,body_top),"#F2E8FB")
+        expected=Image.new("RGBA",(aw,body_top),"#F2E8FB")
+        observed.alpha_composite(result.crop((x,0,x+aw,body_top)))
+        expected.alpha_composite(art.crop((0,0,aw,body_top)))
+        assert observed.tobytes()==expected.tobytes(), (side,text_width,"visible sticker changed")
         # Show the precise text box without generating or redrawing artwork.
         ImageDraw.Draw(result).rectangle(
             (pad_left,text_top,pad_left+text_width-1,text_top+text_height-1),
