@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """Build revision 2 from the user's original artwork; no generative redraw."""
 from pathlib import Path
-from collections import deque
-import math
 import shutil
 import xml.etree.ElementTree as ET
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT / "build-source/usagi-lavender-theme2"
@@ -18,55 +16,17 @@ def input_file(name):
             return p
     raise FileNotFoundError("Required original artwork missing: " + name)
 
-# These coordinates address only clean motif regions of the supplied 1024x1536
-# reference. All UI text, profile pictures and controls are excluded.
-mockup = Image.open(input_file("200611.png")).convert("RGBA").resize((1024,1536))
+# Use the replacement background exactly as supplied: no motif extraction,
+# recoloring, opacity adjustment, shrinking, or pattern regeneration.
+background = input_file("200614.png")
+canvas = Image.open(background).convert("RGBA")
+assert canvas.height > canvas.width, "Expected the supplied portrait background"
 selected = Image.open(input_file("1794869806252.png")).convert("RGBA")
 assert selected.getextrema()[3][0] == 0, "Selected icon must retain its transparent background"
-
-def cutout(box):
-    art = mockup.crop(box).convert("RGBA")
-    # Flood-fill only the lavender background touching the crop border.
-    # Cream body pixels and the dark outline are preserved as supplied.
-    w,h=art.size
-    pixels=art.load()
-    seeds=[(x,0) for x in range(w)]+[(x,h-1) for x in range(w)]
-    seeds += [(0,y) for y in range(h)]+[(w-1,y) for y in range(h)]
-    visited=set()
-    todo=deque(seeds)
-    while todo:
-        x,y=todo.popleft()
-        if (x,y) in visited or not (0<=x<w and 0<=y<h):
-            continue
-        visited.add((x,y))
-        r,g,b,a=pixels[x,y]
-        if min(r,g,b) < 215 or b < r-3 or b < g+2:
-            continue
-        pixels[x,y]=(r,g,b,0)
-        todo.extend([(x-1,y),(x+1,y),(x,y-1),(x,y+1)])
-    alpha=art.getchannel("A")
-    bbox=alpha.getbbox()
-    assert bbox, "Empty motif"
-    return art.crop(bbox)
-
-butt = cutout((418,12,548,130))
-flower = cutout((94,16,145,66))
-# Preview motif size is reduced by 30%, with closer staggered placement.
-canvas=Image.new("RGBA",(1440,2880),"#F2E8FB")
-butt.thumbnail((122,122),Image.Resampling.LANCZOS)
-flower.thumbnail((45,45),Image.Resampling.LANCZOS)
-for row,y in enumerate(range(-70,2910,242)):
-    for col,x in enumerate(range(-30,1470,280)):
-        dx = (135 if row%2 else 0) + ((row*37+col*19)%61)-30
-        dy = ((row*17+col*31)%47)-23
-        angle = [-14,8,-5,15,0][(row+col)%5]
-        motif=butt.rotate(angle,resample=Image.Resampling.BICUBIC,expand=True)
-        canvas.alpha_composite(motif,(x+dx,y+dy))
-        canvas.alpha_composite(flower,(x+dx+165,y+dy+134))
-canvas.save(SOURCE/"background-v2.png")
+shutil.copyfile(background, SOURCE/"background-v2.png")
 for name in ["theme_background_image","theme_chatroom_background_image",
              "theme_passcode_background_image","theme_splash_image"]:
-    canvas.save(DRAW/(name+".png"))
+    shutil.copyfile(background, DRAW/(name+".png"))
 
 # A transparent, aspect-preserving 64dp tile replaces only selected states.
 selected=selected.crop(selected.getbbox())
@@ -145,4 +105,4 @@ sheet=Image.new("RGBA",(960,192),"#F2E8FB")
 for i,tab in enumerate(["friends","chats","now","shopping","more"]):
     sheet.alpha_composite(Image.open(DRAW/f"theme_maintab_ico_{tab}_focused_image.png"),(192*i,0))
 sheet.save(ROOT/"v2-previews/selected-menu.png")
-print("Revision 2 prepared: 70% motif size, denser irregular pattern, fixed-character padding, selected tab art.")
+print("Revision 2 prepared: supplied 200614.png background unchanged, fixed-character padding, selected tab art.")
