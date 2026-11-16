@@ -11,7 +11,12 @@ DRAW = PROJECT / "app/src/main/theme/drawable-xxhdpi"
 SOURCE = PROJECT / "design/source"
 
 def input_file(name):
-    for p in [ROOT/name, ROOT/"assets"/name]:
+    aliases = {
+        "200614.png": "file_00000000d50082099f20787de0b9824d.png",
+        "1794869806252.png": "file_0000000024748206a5d943989cc05052.png",
+    }
+    names = [name, aliases.get(name, name)]
+    for p in [base/n for base in [ROOT, ROOT/"assets"] for n in names]:
         if p.is_file():
             return p
     raise FileNotFoundError("Required original artwork missing: " + name)
@@ -22,7 +27,27 @@ background = input_file("200614.png")
 canvas = Image.open(background).convert("RGBA")
 assert canvas.height > canvas.width, "Expected the supplied portrait background"
 selected = Image.open(input_file("1794869806252.png")).convert("RGBA")
-assert selected.getextrema()[3][0] == 0, "Selected icon must retain its transparent background"
+if selected.getextrema()[3][0] == 255:
+    # If the download flattened transparency to a black matte, remove only
+    # the near-black region connected to the outer border. The white sticker
+    # border separates it from the original character's black line art.
+    from collections import deque
+    w,h=selected.size
+    px=selected.load()
+    q=deque([(x,0) for x in range(w)]+[(x,h-1) for x in range(w)]+
+            [(0,y) for y in range(h)]+[(w-1,y) for y in range(h)])
+    seen=set()
+    while q:
+        x,y=q.popleft()
+        if (x,y) in seen or not (0<=x<w and 0<=y<h):
+            continue
+        seen.add((x,y))
+        r,g,b,a=px[x,y]
+        if max(r,g,b)>12:
+            continue
+        px[x,y]=(r,g,b,0)
+        q.extend([(x-1,y),(x+1,y),(x,y-1),(x,y+1)])
+assert selected.getextrema()[3][0] == 0, "Selected icon needs a transparent outer background"
 shutil.copyfile(background, SOURCE/"background-v2.png")
 for name in ["theme_background_image","theme_chatroom_background_image",
              "theme_passcode_background_image","theme_splash_image"]:
