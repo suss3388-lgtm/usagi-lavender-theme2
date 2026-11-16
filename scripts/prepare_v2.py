@@ -124,6 +124,18 @@ for p in (PROJECT/"app/src/main/theme").glob("values*/strings.xml"):
     tree.write(p,encoding="utf-8",xml_declaration=True)
 gradle=PROJECT/"app/build.gradle.kts"
 text=gradle.read_text().replace('versionName = "1.0.0"','versionName = "1.1.0"')
+# Pin AGP's debug signing input to the keystore restored by Actions. The
+# SDK's own Android user directory can differ from the shell's ~/.android.
+text=text.replace("android {", """android {
+    signingConfigs.getByName("debug") {
+        storeFile = file(System.getProperty("user.home") + "/.android/debug.keystore")
+        storePassword = "android"
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
+        enableV1Signing = true
+        enableV2Signing = true
+    }
+""", 1)
 gradle.write_text(text)
 canvas.resize((720,1440)).save(ROOT/"v2-previews/background.png")
 sheet=Image.new("RGBA",(960,192),"#F2E8FB")
